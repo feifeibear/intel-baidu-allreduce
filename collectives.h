@@ -21,6 +21,8 @@
 // If device == -1, no GPU is used; otherwise, the device specifies which CUDA
 // device should be used. All data passed to other functions must be on that device.
 void InitCollectives(int device);
+void Report(void) ;
+void ResetCounters(void) ;
 
 // The ring allreduce. The lengths of the data chunks passed to this function
 // must be the same across all MPI processes. The output memory will be
@@ -31,5 +33,12 @@ void RingAllreduce(float* data, size_t length, float** output);
 // may differ across different devices. The output memory will be allocated and
 // written into `output`.
 void RingAllgather(float* data, size_t length, float** output);
+
+// custom allocator; huge pages
+float* alloc(size_t size) ;
+void dealloc(float* buffer);
+// Internal buffers
+void Alloc(size_t blen);
+void Dealloc(void);
 
 #endif /* ifndef BAIDU_ALLREDUCE_COLLECTIVES_H_ */
