@@ -25,9 +25,9 @@ void TestCollectivesCPU(std::vector<size_t>& sizes, std::vector<size_t>& iterati
         auto size = sizes[i];
         auto iters = iterations[i];
 
-	ResetCounters();
+	      ResetCounters();
         float* data = alloc(size);
-        float seconds = 0.0f;
+        float seconds = 0.0f, mpi_seconds = 0.0f;
         for(size_t iter = 0; iter < iters; iter++) {
             // Initialize data as a block of ones, which makes it easy to check for correctness.
             for(size_t j = 0; j < size; j++) {
@@ -38,6 +38,14 @@ void TestCollectivesCPU(std::vector<size_t>& sizes, std::vector<size_t>& iterati
             timer.start();
             RingAllreduce(data, size, &output);
             seconds += timer.seconds();
+
+            timer.start();
+            float* output_ref = alloc(size);
+            MPI_Allreduce(data, output_ref, size, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+            free(output_ref);
+            mpi_seconds += timer.seconds();
+
+
 
             // Check that we get the expected result.
             for(size_t j = 0; j < size; j++) {
@@ -51,10 +59,13 @@ void TestCollectivesCPU(std::vector<size_t>& sizes, std::vector<size_t>& iterati
         if(mpi_rank == 0) {
             std::cout << "Verified allreduce for size "
                 << size
-                << " ("
+                << " ( MPI "
+                << mpi_seconds / iters
+                << " s per iteration) "
+                << " ( Baidu "
                 << seconds / iters
                 << " s per iteration)" << std::endl;
-	    Report();
+	          Report();
         }
 
         dealloc(data);
@@ -76,7 +87,8 @@ int main(int argc, char** argv) {
 
     // Number of iterations to run for each buffer size.
     std::vector<size_t> iterations = {
-        10000, 10000, 10000, 10000,
+        10, 10, 10, 10,
+        //10000, 10000, 10000, 10000,
         100, 100, 100, 100,
         100, 100, 100    };
 

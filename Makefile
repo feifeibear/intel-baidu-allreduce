@@ -1,7 +1,7 @@
 # Check that MPI path exists.
 # Check that CUDA path exists.
 
-CXX:=mpiicpc
+CXX=$(HOME)/soft_install/bin/mpicxx #mpicxx #mpiicpc
 LDFLAGS:=-fopenmp
 CFLAGS:=-std=c++11  -I. -fopenmp
 EXE_NAME:=allreduce-test

@@ -1,4 +1,4 @@
-#define HUGE
+//#define HUGE
 
 #include <vector>
 #include <stdexcept>
@@ -463,6 +463,10 @@ void RingAllgather(float* data, size_t length, float** output_ptr) {
         // Segment to recv - at every iteration we receive segment (r-i)
         float* segment_recv = &(output[segment_ends[recv_chunk] -
                                        segment_sizes[recv_chunk]]);
+        //MPI_Sendrecv(segment_send, segment_sizes[send_chunk],
+        //        datatype, send_to, 0, segment_recv,
+        //        segment_sizes[recv_chunk], datatype, recv_from,
+        //        0, MPI_COMM_WORLD, &recv_status);
         OMP_Sendrecv_float(segment_send, segment_sizes[send_chunk], send_to  , 0, 
 		           segment_recv, segment_sizes[recv_chunk], recv_from, 0);
     }
