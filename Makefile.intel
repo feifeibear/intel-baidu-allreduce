@@ -1,0 +1,22 @@
+# Check that MPI path exists.
+# Check that CUDA path exists.
+
+CXX=mpicxx #$(HOME)/soft_install/bin/mpicxx #mpicxx #mpiicpc
+#LDFLAGS:=-fopenmp
+CFLAGS:=-O2 -I.
+EXE_NAME:=allreduce-test
+SRC:=$(wildcard *.cpp test/*.cpp)
+OBJS:=$(SRC:.cpp=.o)
+all: $(EXE_NAME)
+
+$(EXE_NAME): $(OBJS)
+	$(CXX) -o $(EXE_NAME) $^ $(LDFLAGS) 
+
+%.o: %.cpp
+	$(CXX) -c $(CFLAGS) $< -o $@
+
+test: $(EXE_NAME)
+	mpirun -np 8 $(EXE_NAME)
+
+clean:
+	rm -f *.o test/*.o $(EXE_NAME)
